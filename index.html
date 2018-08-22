@@ -1,0 +1,64 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.6/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.6/addons/p5.dom.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script language="javascript" type="text/javascript" src="script/config.js"></script>
+  <script language="javascript" type="text/javascript" src="script/class.js"></script>
+  <script language="javascript" type="text/javascript" src="script/functions.js"></script>
+  <script language="javascript" type="text/javascript" src="script/script.js"></script>
+</head>
+
+<body>
+  <div id="start" class="modal">
+    <div class="modal-content">
+      <span id="closeStart" class = "close">&times;</span>
+      <h1>Beat these 3 levels and Create your own</h1>
+      <button type="button" id="lvl1">Level 1 </button>
+      <button type="button" id="lvl2">Level 2</button>
+      <button type="button" id="lvl3">Level 3</button>
+      <h4>or</h4>
+      <form>
+        <input type="text" name="data" id="data" placeholder="Insert link to load the game">
+        <input type="submit" value="Submit" id="submit">
+      </form>
+    </div>
+  </div>
+  <div id="getLink" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeLink" class = "close">&times;</span>
+      <input type = "text" value = "" id = "link"></p>
+      <button type="button" id="OK">Copy link to Clipboard</button>
+    </div>
+  </div>
+  <div id="build" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeBuild" class = "close">&times;</span>
+      <h1>Congratulations!!! Now you can build your own level</h1>
+      <button type="button" id="letsstart">Let's start</button>
+    </div>
+  </div>
+  <div id="save" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeSave"  class = "close">&times;</span>
+      <h1 class="message">You Won</h1>
+      <h1 class="message">Press SAVE to get your link</h1>
+      <button type="button" id="saveButton">Save</button>
+    </div>
+  </div>
+  <div id="delete" class="modal hidden">
+    <div class="modal-content">
+      <h1>Delete everything?</h1>
+      <button type="button" id="yes">YES</button>
+      <button type="button" id="no">NO</button>
+    </div>
+  </div>
+
+  <script language="javascript" type="text/javascript" src="script/popup.js"></script>
+
+</body>
+
+
+</html>
