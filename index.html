@@ -12,13 +12,13 @@
 </head>
 
 <body>
-  <div id="start" class="modal">
+  <div id="start" class="modal hidden">
     <div class="modal-content">
-      <span id="closeStart" class = "close">&times;</span>
+      <span id="closeStart" class="close">&times;</span>
       <h1>Beat these 3 levels and Create your own</h1>
-      <button type="button" id="lvl1">Level 1 </button>
-      <button type="button" id="lvl2">Level 2</button>
-      <button type="button" id="lvl3">Level 3</button>
+      <button type="button" id="lvl1" disabled>Level 1 </button>
+      <button type="button" id="lvl2" disabled>Level 2</button>
+      <button type="button" id="lvl3" disabled>Level 3</button>
       <h4>or</h4>
       <form>
         <input type="text" name="data" id="data" placeholder="Insert link to load the game">
@@ -28,21 +28,22 @@
   </div>
   <div id="getLink" class="modal hidden">
     <div class="modal-content">
-      <span id="closeLink" class = "close">&times;</span>
-      <input type = "text" value = "" id = "link"></p>
+      <span id="closeLink" class="close">&times;</span>
+      <input type="text" value="" id="link">
+      </p>
       <button type="button" id="OK">Copy link to Clipboard</button>
     </div>
   </div>
   <div id="build" class="modal hidden">
     <div class="modal-content">
-      <span id="closeBuild" class = "close">&times;</span>
+      <span id="closeBuild" class="close">&times;</span>
       <h1>Congratulations!!! Now you can build your own level</h1>
       <button type="button" id="letsstart">Let's start</button>
     </div>
   </div>
   <div id="save" class="modal hidden">
     <div class="modal-content">
-      <span id="closeSave"  class = "close">&times;</span>
+      <span id="closeSave" class="close">&times;</span>
       <h1 class="message">You Won</h1>
       <h1 class="message">Press SAVE to get your link</h1>
       <button type="button" id="saveButton">Save</button>

@@ -1,4 +1,5 @@
 function preload() {
+    //loading the images
     stoneImg = loadImage(stoneImg);
     sandImg = loadImage(sandImg);
     metalImg = loadImage(metalImg);
@@ -12,9 +13,21 @@ function preload() {
     startImg = loadImage(startImg);
     stopImg = loadImage(stopImg);
     nextArrowImg = loadImage(nextArrowImg);
+    seaImg = loadImage(seaImg);
     deleteButton.img = loadImage(deleteButton.img);
     menuImg = loadImage(menuImg);
     starImg = loadImage(starImg);
+
+    for (let i = 0; i < deathTool.numOfFrames; i++) {
+        window["deathImg" + i] = loadImage(window["deathImg" + i])
+    }
+    for (let i = 0; i < verticalTool.numOfFrames; i++) {
+        window["verticalImg" + i] = loadImage(window["verticalImg" + i])
+    }
+    for (let i = 0; i < horizontalTool.numOfFrames; i++) {
+        window["horizontalImg" + i] = loadImage(window["horizontalImg" + i])
+    }
+    //creating the main objects
     player = new Player(playerStartingX, playerStartingY, playerWidth, playerHeight, playerSprite, playerVX, playerVY, playerA);
     cup = new Cup(cupStartingX, cupStartingY, cupWidth, cupHeight, cupImg);
 }
@@ -22,14 +35,7 @@ function preload() {
 function setup() {
     createCanvas(canvasWidth, canvasHeight);
     noStroke();
-    for (let i = 0; i <= width / waveSize; i++) {
-        seaArr.push({
-            size: waveSize,
-            x: i * waveSize + waveSize / 2,
-            y: seaStartingY
-        });
-    }
-
+    //preparing the toolBar
     for (let i = 0; i < toolsFunctions.length; i++) {
         tools.push({
             x: i * width / toolsFunctions.length,
@@ -107,6 +113,7 @@ function setup() {
             toolsForPlaying[i].imgW = menuW;
         }
     }
+    //if there is an initial input, it constructs the level
     initalInput = checkInput();
     if (initalInput) {
         deleteEverything();
@@ -117,42 +124,31 @@ function setup() {
 }
 
 function draw() {
+    //checks if there is an input of not. if the condition is satisfied, it closes the "starting" popup
     check();
+    //draws the background
     drawBackground(x, y);
+
+    //saves the object in a variable
     var menu = toolsForPlaying.find(function (item) {
         return item.f == "Menu"
     });
-    var next = toolsForPlaying.find(function (item) {
-        return item.f == "Next"
-    });
+    //enable/disable the menu
     if (gameStarted)
         menu.opacity = 0.5;
     else
         menu.opacity = 1;
 
-    // if (playerWon)
-    //     next.opacity = 1;
-    // else
-    //     next.opacity = 0.5;
-
     let input = checkInput();
-    if (levelsPassed <= 3)
-        enableDisable(levelsPassed);
+    
+    //disables the toolbar's function if there is a popup
     if (!popup) {
         if (gameStarted) {
             player.play();
-            star.x = cup.x + cup.w / 2 - star.w/2;
-            star.y = cup.y + cup.h / 2;
         }
         else {
-            if (!playerWon) {
-                star.x = cup.x + cup.w / 2 - star.w/2;
-                star.y = cup.y + cup.h / 2;
-            }
-            else if (star.y > cup.y - 50) {
-                star.y--;
-            }
-            if (levelsPassed >= 3 || input) {
+            //if player passed 3 levels or there is an input, allows editing of objects
+            if (levelsPassed >= 4 || input) {
                 player.prepare();
                 cup.edit();
                 if (mouseIsPressed) {
@@ -168,10 +164,20 @@ function draw() {
                 }
             }
         }
+
+        //player won the levels-star rises
+        if (playerWon || playerWonTemp) {
+            starRise();
+        }
+        else {
+            star.x = cup.x + cup.w / 2 - star.w / 2;
+            star.y = cup.y
+        }
     }
 }
 
 function mouseReleased() {
+    //mouse is Released => there are no objects which are being edited
     if (editedBlocksID >= 0 && editedBlocksID != undefined) {
         blocks[editedBlocksID].deleteBlock()
         editedBlocksID = undefined;
@@ -186,15 +192,20 @@ function mouseReleased() {
 }
 
 function mousePressed() {
+    //disables everything if there is a popup
     if (!popup) {
         let input = checkInput();
+        //checks if mouse was pressed on the canvas
         if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
             if (!gameStarted) {
+                //ckecks if mouse was pressed on the trash box
                 if (mouseX > deleteButton.x && mouseX < deleteButton.x + deleteButton.w && mouseY > deleteButton.y && mouseY < deleteButton.y + deleteButton.h && (editedBlocksID == undefined || editedBlocksID < 0) && !playerEditing && (editedCoinsID == undefined || editedCoinsID < 0) && !blockRangeEditing) {
-                    if (levelsPassed >= 3 || input)
+                    //needs a confirmation to delete everything
+                    if (levelsPassed >= 4 || input)
                         confirm();
                 }
                 else {
+                    //editing different objects
                     editedBlocksID = editBlocks();
                     editedCoinsID = editCoins();
                     if ((editedBlocksID == undefined || editedBlocksID < 0) && (editedCoinsID == undefined || editedCoinsID < 0) && !cupEditing && !blockRangeEditing && mouseX > player.x + x && mouseX < player.x + x + player.w && mouseY > player.y + y && mouseY < player.y + y + player.h) {
@@ -216,7 +227,7 @@ function mousePressed() {
                 }
             }
             if (mouseY <= toolBarHeight) {
-
+                //toolBarfunction for both cases (passed 3 levels and not passed)
                 if (levelsPassed <= 3 && !input) {
                     toolBarFunction(toolsForPlaying);
                 }
@@ -230,12 +241,14 @@ function mousePressed() {
 
 
 function keyPressed() {
+    //starts jumping
     if (keyCode == UP_ARROW && !popup) {
         player.startJump();
     }
 }
 
 function keyReleased() {
+    //starts falling
     if (keyCode == UP_ARROW && !popup) {
         player.endJump();
     }

@@ -16,8 +16,8 @@ class Player extends Parent {
         this.accelaration = a;
         this.downCollBlock = undefined;
         this.dead = false;
-        this.opacity = 1;
         this.eatenCoins = 0;
+        this.opacity = 1;
         this.collision = {
             right: false,
             left: false,
@@ -29,32 +29,37 @@ class Player extends Parent {
     }
 
     animate() {
-
+        //makes the player transparent if needed
         tint(255, 255 * this.opacity);
         if (!gameStarted) {
+            //standing picture of the player
             image(playerSprite, this.x - (playerWalkSprite.w - this.w) / 2, this.y, playerWalkSprite.w, playerWalkSprite.h, ...playerStand);
         }
         else {
             if (keyIsDown(RIGHT_ARROW) || keyIsDown(LEFT_ARROW) || keyIsDown(UP_ARROW)) {
-                image(this.img, this.x - (playerWalkSprite.w - this.w) / 2, this.y, playerWalkSprite.w, playerWalkSprite.h, window['playerWalk' + this.walkCounter].x, window['playerWalk' + this.walkCounter].y, playerWalkSprite.w, playerWalkSprite.h);
+                //walking player
+                image(this.img, this.x - (playerWalkSprite.w - this.w) / 2, this.y, playerWalkSprite.w, playerWalkSprite.h, window['playerWalk' + (this.walkCounter >= 0 ? this.walkCounter : "_" + Math.abs(this.walkCounter))].x, window['playerWalk' + (this.walkCounter >= 0 ? this.walkCounter : "_" + Math.abs(this.walkCounter))].y, playerWalkSprite.w, playerWalkSprite.h);
             }
             else {
+                //standing picture of the player
                 image(playerSprite, this.x - (playerWalkSprite.w - this.w) / 2, this.y, playerWalkSprite.w, playerWalkSprite.h, ...playerStand);
                 this.walkCounter = 0;
             }
         }
+        //prevents other images from being transparent
         tint(255, 255);
     }
 
     play() {
+        //player must move and check collision until death
         if (!player.dead) {
             this.move();
             this.checkCollision();
         }
-
     }
 
     prepare() {
+        // before starting the game we need to prepare the world for playing
         this.edit();
         if (!playerEditing)
             this.snap();
@@ -62,49 +67,67 @@ class Player extends Parent {
     }
 
     move() {
-        if (this.walkCounter == playerWalkFrames - 1)
-            this.walkCounter = 0
-
+        // looping sprite animation
+        if (this.walkCounter == playerWalkFrames - 1 || this.walkCounter == -playerWalkFrames + 1) {
+            this.walkCounter = 0;
+        }
         if (keyIsDown(LEFT_ARROW) && !this.collision.left) {
-            this.dirX = -1;
-            this.walkCounter++;
+            //flips the player if it needs to be filpped
+            if (this.dirX >= 0) {
+                this.walkCounter = -1;
+                this.dirX = -1;
+            }
+            else {
+                this.walkCounter--;
+            }
+
             if (this.x > 0) {
                 this.x -= this.speedX;
-
+                //if it is possible it moves also the background
                 if (x < 0) {
                     x += this.speedX;
                 }
             }
         }
         else if (keyIsDown(RIGHT_ARROW) && !this.collision.right) {
-            this.walkCounter++;
-            this.dirX = 1;
+            //flips the player if it needs to be filpped
+            if (this.dirX <= 0) {
+                this.walkCounter = 1;
+                this.dirX = 1;
+            }
+            else {
+                this.walkCounter++;
+            }
             if (this.x + this.w <= backgroundSize) {
                 this.x += this.speedX;
-                if (this.x + x + this.w / 2 >= canvasWidth / 2) {
+                //if it is possible it moves also the background
+                if (x > width - backgroundSize) {
                     x -= this.speedX;
                 }
 
             }
         }
 
-
+        //limiting the falling speed
         if (this.speedY < playerFallingMaxSpeed)
             this.speedY += gravity;
 
+        //if the block with which the player has a collision is a "Vertical" block, the player talkes its velocity 
         if (this.collision.down)
             this.speedY = this.downCollBlock.type == "Vertical" ? this.downCollBlock.dirY : 0;
-
+        //a part of jumping
         if (!this.collision.up || this.speedY >= 0)
             this.y += this.speedY;
         else
             this.speedY = 0;
 
+        //player drowns
         if (this.y >= seaStartingY - this.h / 2 && !player.dead)
             this.die();
     }
 
     startJump() {
+        //while we hold the key, it gains acceleration
         if (this.collision.down) {
             this.y -= 2;
             this.speedY = playerJumpV0;
@@ -113,13 +136,14 @@ class Player extends Parent {
     }
 
     endJump() {
+        //falling part
         if (this.speedY < -playerFallingMaxSpeed) {
             this.speedY = -playerFallingMaxSpeed;
         }
     }
 
     checkCollision() {
-
+        //collision with the blocks
         var that = this;
         var arrayY = [];
         var bottomColls = blocks.filter(function (block) {
@@ -208,6 +232,7 @@ class Player extends Parent {
             this.die();
         }
 
+        //collisions with the coins (keys)
         var eaten = coins.filter(function (coin) {
             return that.x + that.w > coin.x && that.x < coin.x + coin.w && that.y + that.h > coin.y && that.y < coin.y + coin.h
         });
@@ -217,12 +242,28 @@ class Player extends Parent {
             player.eatenCoins++;
         });
 
+        //collision with the cup (lock)
         if (this.x + this.w > cup.x && this.x < cup.x + cup.w && this.y + this.h > cup.y && this.y < cup.y + cup.h && cup.available) {
-            this.win();
+            //checks which level has the player passed
+            let input = checkInput()
+            gameStarted = false;
+            if (levelsPassed > 3 || input) {
+                playerWon = true;
+            }
+            else if (levelsPassed == 3 && !input && currentLvl == levelsPassed) {
+                playerWonTemp = true;
+            }
+            else {
+                playerWonTemp = true;
+            }
+            if (levelsPassed < 3 && !input) {
+                playerWonTemp = true;
+            }
         }
     }
 
     snap() {
+        //doesn't let the blocks to be on the player
         for (var b in blocks) {
             let block = blocks[b];
             if (this.y - block.y + this.h < this.h / 2 && this.y - block.y + this.h > 0 && this.x - block.x <= block.w && block.x - this.x <= this.w) {
@@ -243,6 +284,7 @@ class Player extends Parent {
     }
 
     edit() {
+        //editing the player
         if (playerEditing) {
             this.x = mouseX - this.w / 2 - x;
             this.y = mouseY - this.h / 2 - y;
@@ -250,10 +292,9 @@ class Player extends Parent {
     }
 
     win() {
-        let input = checkInput()
-        gameStarted = false;
+        // checks which level has the player won
+        let input = checkInput();
         if (levelsPassed > 3 || input) {
-            playerWon = true;
             saveBox.style.display = "block";
             popup = true;
         }
@@ -264,19 +305,26 @@ class Player extends Parent {
         else {
             startPopUp.style.display = "block";
             popup = true;
+            //disables not passed levels to prevent cheating
+            if (levelsPassed <= 3)
+                enableDisable(levelsPassed);
         }
         if (levelsPassed < 3 && !input) {
             levelsPassed++
             startPopUp.style.display = "block";
             popup = true;
+            //disables not passed levels to prevent cheating
+            if (levelsPassed <= 3)
+                enableDisable(levelsPassed);
         }
-        construct(data);
+        construct(data)
     }
 
     die() {
+        //blinks the player
         this.dead = true;
         var b = setInterval(blink, 100)
-
+        //  reconstructs the level after 1 second
         setTimeout(function () {
             gameStarted = false;
             clearInterval(b)
@@ -292,6 +340,7 @@ class Block extends Parent {
     }
 
     deleteBlock() {
+        // if a block has a collision whith the trash box, this function deletes that block after the mouse is released
         if (this.x + this.w / 2 > deleteButton.x - x && this.x + this.w / 2 < deleteButton.x - x + deleteButton.w && this.y + this.h / 2 > deleteButton.y - y && this.y + this.h / 2 < deleteButton.y - y + deleteButton.h) {
             blocks.splice(blocks.indexOf(this), 1)
         }
@@ -313,6 +362,7 @@ class HorizontalBlock extends Block {
         }
     }
     move() {
+        //moving the "Horizontal" block horizontally
         if (this.x + this.w / 2 > this.staticX + this.editRange || this.x + this.w / 2 < this.staticX) {
             this.dirX *= -1;
         }
@@ -320,13 +370,14 @@ class HorizontalBlock extends Block {
     }
 
     edit() {
+        //editing the block's editing range
         if (blockRangeEditing) {
             if (blockRangeEditing.x == this.x && blockRangeEditing.y == this.y) {
                 if (mouseX - this.editor.w / 2 - x >= this.x + this.w / 2)
                     this.editor.x = mouseX - this.editor.w / 2 - x;
                 else
                     this.editor.x = this.x + this.w / 2;
-                //test
+
                 this.editRange = this.editor.x + this.editor.w / 2 - (this.x + this.w / 2);
             }
         }
@@ -348,6 +399,7 @@ class VerticalBlock extends Block {
         }
     }
     move() {
+        //moving the "Vertical" block horizontally
         if (this.y + this.h / 2 > this.staticY + this.editRange || this.y + this.h / 2 < this.staticY) {
             this.dirY *= -1;
         }
@@ -356,13 +408,13 @@ class VerticalBlock extends Block {
 
     edit() {
         if (blockRangeEditing) {
-
+            //editing the block's editing range
             if (blockRangeEditing.x == this.x && blockRangeEditing.y == this.y) {
                 if (mouseY - this.editor.h / 2 + y >= this.y + this.h / 2)
                     this.editor.y = mouseY - this.editor.h / 2 + y;
                 else
                     this.editor.y = this.y + this.h / 2
-                //test
+
                 this.editRange = this.editor.y + this.editor.h / 2 - (this.y + this.h / 2);
 
             }
@@ -379,6 +431,7 @@ class SandBlock extends Block {
         this.startedBreaking = false;
     }
     break() {
+        //if the player steps on this block, it starts breaking
         if (!this.startedBreaking) {
             this.startedBreaking = true;
             sandBreaker(this);
@@ -400,6 +453,7 @@ class DeathBlock extends Block {
     }
 
     move() {
+        // moves the killing part of the killer block
         if (this.slicer.y + this.slicer.h < this.y || this.y - this.slicer.y < this.slicer.h - this.h) {
             this.slicer.dirY *= -1
         }
@@ -407,6 +461,7 @@ class DeathBlock extends Block {
     }
 
     kill() {
+        //murders the player, if there's a collision with the killing-part of the block
         if (Math.abs((this.slicer.x + this.slicer.w / 2) - (player.x + player.w / 2)) < this.slicer.w / 2 + player.w / 2 && player.y + player.h > this.slicer.y && player.y + player.h < this.slicer.y + this.slicer.h && !player.dead)
             player.die()
     }
@@ -417,6 +472,7 @@ class Coin extends Parent {
     constructor(x, y, w, h, img) {
         super(x, y, w, h, img);
     }
+    // if a block has a collision whith the trash box, this function deletes that block after the mouse is released
     deleteCoin() {
         if (this.x + this.w / 2 > deleteButton.x - x && this.x + this.w / 2 < deleteButton.x - x + deleteButton.w && this.y + this.h / 2 > deleteButton.y - y && this.y + this.h / 2 < deleteButton.y - y + deleteButton.h) {
             coins.splice(coins.indexOf(this), 1)
@@ -430,6 +486,7 @@ class Cup extends Parent {
         this.alpha = 0.5;
         this.available = false
     }
+    //if all of the coins (keys) are eatten, the cup (lock) is available
     checkAvailablity() {
         if (coins.length == 0) {
             this.alpha = 1;
@@ -442,6 +499,7 @@ class Cup extends Parent {
     }
 
     drawCup() {
+        //drawing the cup (lock)
         this.checkAvailablity();
         tint(255, this.alpha * 255)
         image(cupImg, this.x, this.y, this.w, this.h);
@@ -449,6 +507,7 @@ class Cup extends Parent {
     }
 
     edit() {
+        //editing thw cup (lock)
         if (cupEditing) {
             this.x = mouseX - this.w / 2 - x;
             this.y = mouseY - this.h / 2 - y;

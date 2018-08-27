@@ -59,9 +59,17 @@ canvas{
     border-color: #88e060;
     background-color: #88e060;
 }
+#lvl2:disabled{
+    border-color:#88e060;
+    background-color:#aaa;
+}
 #lvl3{
     border-color: #FFD948;
     background-color: #FFD948;
+}
+#lvl3:disabled{
+    border-color: #FFD948;
+    background-color: #aaa;
 }
 .modal h1{
     font-size: 22;
