@@ -1,5 +1,6 @@
 function preload() {
     //loading the images
+
     stoneImg = loadImage(stoneImg);
     sandImg = loadImage(sandImg);
     metalImg = loadImage(metalImg);
@@ -8,28 +9,19 @@ function preload() {
     cupImg = loadImage(cupImg);
     slicerImg = loadImage(slicerImg);
     backgroundImg = loadImage(backgroundImg);
-    hArrowImg = loadImage(hArrowImg);
-    vArrowImg = loadImage(vArrowImg);
     startImg = loadImage(startImg);
     stopImg = loadImage(stopImg);
-    nextArrowImg = loadImage(nextArrowImg);
-    seaImg = loadImage(seaImg);
     deleteButton.img = loadImage(deleteButton.img);
     menuImg = loadImage(menuImg);
     starImg = loadImage(starImg);
+    sandToolImg = loadImage(sandToolImgUrl);
+    HToolImg = loadImage(HToolImgUrl);
+    VToolImg = loadImage(VToolImgUrl);
+    deathToolImg = loadImage(deathToolImgUrl);
 
-    for (let i = 0; i < deathTool.numOfFrames; i++) {
-        window["deathImg" + i] = loadImage(window["deathImg" + i])
-    }
-    for (let i = 0; i < verticalTool.numOfFrames; i++) {
-        window["verticalImg" + i] = loadImage(window["verticalImg" + i])
-    }
-    for (let i = 0; i < horizontalTool.numOfFrames; i++) {
-        window["horizontalImg" + i] = loadImage(window["horizontalImg" + i])
-    }
     //creating the main objects
-    player = new Player(playerStartingX, playerStartingY, playerWidth, playerHeight, playerSprite, playerVX, playerVY, playerA);
-    cup = new Cup(cupStartingX, cupStartingY, cupWidth, cupHeight, cupImg);
+    player = new Player(playerStartingX, playerStartingY, playerWidth, playerHeight, playerVX, playerVY, playerA);
+    cup = new Cup(cupStartingX, cupStartingY, cupWidth, cupHeight);
 }
 
 function setup() {
@@ -44,26 +36,26 @@ function setup() {
             h: toolBarHeight,
             color: toolBarColor,
             f: toolsFunctions[i]
-        })
+        });
 
-        if (toolsFunctions[i] == "Stone") {
+        if (toolsFunctions[i] === "Stone") {
             tools[i].img = stoneImg;
             tools[i].imgH = stoneHeight;
             tools[i].imgW = stoneWidth;
         }
-        else if (toolsFunctions[i] == "Horizontal") {
+        else if (toolsFunctions[i] === "Horizontal") {
             tools[i].vX = 0.2;
             tools[i].img = metalImg;
             tools[i].imgH = metalBlocksHeight;
             tools[i].imgW = metalBlocksWidth;
         }
-        else if (toolsFunctions[i] == "Vertical") {
+        else if (toolsFunctions[i] === "Vertical") {
             tools[i].vY = 0.2;
             tools[i].img = metalImg;
             tools[i].imgH = metalBlocksHeight;
             tools[i].imgW = metalBlocksWidth;
         }
-        else if (toolsFunctions[i] == "Death") {
+        else if (toolsFunctions[i] === "Death") {
             tools[i].img = metalImg;
             tools[i].imgH = metalBlocksHeight;
             tools[i].imgW = metalBlocksWidth;
@@ -73,20 +65,18 @@ function setup() {
                 w: tools[i].imgW,
                 h: tools[i].imgH / 2,
                 vY: 0.2,
-                img: slicerImg
             }
         }
-        else if (toolsFunctions[i] == "Sand") {
+        else if (toolsFunctions[i] === "Sand") {
             tools[i].img = sandImg;
             tools[i].imgH = sandHeight;
             tools[i].imgW = sandWidth;
             tools[i].opacity = 1;
         }
-        else if (toolsFunctions[i] == "Coin") {
+        else if (toolsFunctions[i] === "Coin") {
             tools[i].img = coinImg;
             tools[i].imgH = coinSize;
             tools[i].imgW = coinSize;
-
         }
     }
 
@@ -101,37 +91,54 @@ function setup() {
             opacity: 1
         })
 
-        if (toolsForPlaying[i].f == "Next") {
+        if (toolsForPlaying[i].f === "Next") {
             toolsForPlaying[i].img = nextArrowImg;
             toolsForPlaying[i].imgH = nextArrowH;
             toolsForPlaying[i].imgW = nextArrowW;
             toolsForPlaying[i].opacity = 0.5;
         }
-        else if (toolsForPlaying[i].f == "Menu") {
+        else if (toolsForPlaying[i].f === "Menu") {
             toolsForPlaying[i].img = menuImg;
             toolsForPlaying[i].imgH = menuH;
             toolsForPlaying[i].imgW = menuW;
         }
     }
     //if there is an initial input, it constructs the level
-    initalInput = checkInput();
-    if (initalInput) {
+
+    if (input) {
         deleteEverything();
-        construct(initalInput)
+        construct(input)
         built = true;
     }
-
 }
 
 function draw() {
-    //checks if there is an input of not. if the condition is satisfied, it closes the "starting" popup
-    check();
+
+    if(player.dead)
+    {
+        if(frameCount % blinkTimeInterval === 0) {
+            // every 100 milisecs
+            player.blinkCount++;
+
+            if (player.opacity === 1)  player.opacity = 0.5;
+            else player.opacity = 1;
+        }
+    
+        if(player.blinkCount === playerBlinkCount) {
+            // every second
+            gameStarted = false;
+            construct(data);
+        }
+    }
+
+    //checks if there is an input or not. if the condition is satisfied, it closes the "starting" popup
+    //check(); // MATTER OF INVESTIGATION: do we need to check this function on each draw step? Maybe we can attach it to an event e.g. load/click/etc?
     //draws the background
-    drawBackground(x, y);
+    drawBackground(x, y); // MATTER OF INVESTIGATION
 
     //saves the object in a variable
     var menu = toolsForPlaying.find(function (item) {
-        return item.f == "Menu"
+        return item.f === "Menu";
     });
     //enable/disable the menu
     if (gameStarted)
@@ -139,8 +146,6 @@ function draw() {
     else
         menu.opacity = 1;
 
-    let input = checkInput();
-    
     //disables the toolbar's function if there is a popup
     if (!popup) {
         if (gameStarted) {
@@ -155,7 +160,7 @@ function draw() {
                     if (editedBlocksID >= 0) {
                         blocks[editedBlocksID].x = mouseX - x - blocks[editedBlocksID].w / 2;
                         blocks[editedBlocksID].y = mouseY - y - blocks[editedBlocksID].h / 2;
-                        updateBlocksCoordinates(editedBlocksID)
+                        updateBlocksCoordinates(editedBlocksID);
                     }
                     if (editedCoinsID >= 0) {
                         coins[editedCoinsID].x = mouseX - x - coins[editedCoinsID].w / 2;
@@ -171,7 +176,7 @@ function draw() {
         }
         else {
             star.x = cup.x + cup.w / 2 - star.w / 2;
-            star.y = cup.y
+            star.y = cup.y;
         }
     }
 }
@@ -179,13 +184,14 @@ function draw() {
 function mouseReleased() {
     //mouse is Released => there are no objects which are being edited
     if (editedBlocksID >= 0 && editedBlocksID != undefined) {
-        blocks[editedBlocksID].deleteBlock()
+        blocks[editedBlocksID].deleteBlock();
         editedBlocksID = undefined;
     }
     if (editedCoinsID >= 0 && editedCoinsID != undefined) {
         coins[editedCoinsID].deleteCoin();
         editedCoinsID = undefined;
     }
+
     playerEditing = false;
     blockRangeEditing = false;
     cupEditing = false;
@@ -194,7 +200,6 @@ function mouseReleased() {
 function mousePressed() {
     //disables everything if there is a popup
     if (!popup) {
-        let input = checkInput();
         //checks if mouse was pressed on the canvas
         if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
             if (!gameStarted) {
@@ -208,10 +213,10 @@ function mousePressed() {
                     //editing different objects
                     editedBlocksID = editBlocks();
                     editedCoinsID = editCoins();
-                    if ((editedBlocksID == undefined || editedBlocksID < 0) && (editedCoinsID == undefined || editedCoinsID < 0) && !cupEditing && !blockRangeEditing && mouseX > player.x + x && mouseX < player.x + x + player.w && mouseY > player.y + y && mouseY < player.y + y + player.h) {
+                    if ((editedBlocksID === undefined || editedBlocksID < 0) && (editedCoinsID === undefined || editedCoinsID < 0) && !cupEditing && !blockRangeEditing && mouseX > player.x + x && mouseX < player.x + x + player.w && mouseY > player.y + y && mouseY < player.y + y + player.h) {
                         playerEditing = true;
                     }
-                    if ((editedBlocksID == undefined || editedBlocksID < 0) && (editedCoinsID == undefined || editedCoinsID < 0) && !cupEditing && !playerEditing) {
+                    if ((editedBlocksID === undefined || editedBlocksID < 0) && (editedCoinsID === undefined || editedCoinsID < 0) && !cupEditing && !playerEditing) {
                         blockRangeEditing = blocks.find(function (b) {
 
                             if (b.editor) {
@@ -220,12 +225,13 @@ function mousePressed() {
                         });
                     }
 
-                    if ((editedBlocksID == undefined || editedBlocksID < 0) && (editedCoinsID == undefined || editedCoinsID < 0) && !blockRangeEditing && !playerEditing &&
+                    if ((editedBlocksID === undefined || editedBlocksID < 0) && (editedCoinsID === undefined || editedCoinsID < 0) && !blockRangeEditing && !playerEditing &&
                         mouseX > cup.x + x && mouseX < cup.x + x + cup.w && mouseY > cup.y + y && mouseY < cup.y + y + cup.h) {
                         cupEditing = true;
                     }
                 }
             }
+
             if (mouseY <= toolBarHeight) {
                 //toolBarfunction for both cases (passed 3 levels and not passed)
                 if (levelsPassed <= 3 && !input) {
@@ -239,19 +245,28 @@ function mousePressed() {
     }
 }
 
-
 function keyPressed() {
     //starts jumping
-    if (keyCode == UP_ARROW && !popup) {
+    if (keyCode === UP_ARROW && !popup) {
         player.startJump();
+    }
+    if (keyCode === LEFT_ARROW) {
+        player.left_right[0] = true;
+    }
+    if (keyCode === RIGHT_ARROW) {
+        player.left_right[1] = true;
     }
 }
 
 function keyReleased() {
     //starts falling
-    if (keyCode == UP_ARROW && !popup) {
+    if (keyCode === UP_ARROW && !popup) {
         player.endJump();
     }
+    if (keyCode === LEFT_ARROW) {
+        player.left_right[0] = false;
+    }
+    if (keyCode === RIGHT_ARROW) {
+        player.left_right[1] = false;
+    }
 }
-
-

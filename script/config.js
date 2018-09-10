@@ -1,3 +1,5 @@
+//MATTER OF INVESTIGATION: get rid of the global variables
+
 var canvasWidth = 800;
 var canvasHeight = 500;
 var popup = false;
@@ -6,11 +8,16 @@ var y = 0;
 var levelsPassed = 1;
 var gameStarted = false;
 var gravity = 0.5;
+var editModeEnabled = false;
 
 var stoneImg = 'images/brickWall.png';
 var sandImg = 'images/grassCenter_rounded.png';
 var metalImg = 'images/grassMid.png';
-
+var sandToolImgUrl = "images/fragile_soil.png";
+var HToolImgUrl = "images/moving_H.png";
+var VToolImgUrl = "images/moving_V.png";
+var deathToolImgUrl = "images/death0.png";
+var sandToolImg, HToolImg, VToolImg, deathToolImg;
 var startImg = "images/forward.png";
 var stopImg = "images/pause.png";
 var starImg = "images/star.png";
@@ -23,7 +30,6 @@ var verticalToolFrameCount = 10;
 var horizontalToolFrameCount = 10;
 
 var toolBarColor = [246, 192, 143];
-var seaImg = "images/sea.png";
 var minimapCameraStroke = 4;
 var editorColor = [170, 170, 170, 50]; //r g b alpha
 var player, cup;
@@ -31,45 +37,32 @@ var playerOpacity = 50;
 var deathTool = {
     numOfFrames: 3,
     counter: 0
-}
-
-var deathImg0 = "images/death0.png";
-var deathImg1 = "images/death1.png";
-var deathImg2 = "images/death2.png";
+};
 
 var verticalTool = {
     numOfFrames: 3,
     counter: 0
-}
-
-var verticalImg0 = "images/vertical0.png";
-var verticalImg1 = "images/vertical1.png";
-var verticalImg2 = "images/vertical2.png";
-
+};
 
 var horizontalTool = {
     numOfFrames: 3,
     counter: 0
-}
-
-var horizontalImg0 = "images/horizontal0.png";
-var horizontalImg1 = "images/horizontal1.png";
-var horizontalImg2 = "images/horizontal2.png";
+};
 
 var sandTool = {
     opacity: 1,
     numOfSteps: 3,
     counter: 3
-}
+};
 
 var player;
 var playerStartingX = 100;
 var playerStartingY = 200;
 var playerWidth = 30;
 var playerHeight = 97;
-var playerWalkSprite = { w: 72, h: 97 }
+var playerWalkSprite = { w: 72, h: 97 };
 var playerWalkFrames = 11;
-var playerSprite = "images/player.png"
+var playerSprite = "images/player.png";
 var playerWalk0 = { x: 0, y: 0 };
 var playerWalk1 = { x: 73, y: 0 };
 var playerWalk2 = { x: 146, y: 0 };
@@ -96,18 +89,18 @@ var playerStand = [0, 196, 66, 92];
 var playerWon = false;
 var starIsRising = false;
 
+var playerBlinkCount = 7;
+var blinkTimeInterval = 60 / (1000 / 100); // 100 miliseconds: 60 frame per seconds, 1000 miliseconds, 100 miliseconds interval
+
 //call the function blocksNum(link) to know how difficult is the level
-var linkLvl1 = "JTdCJTIyYmxvY2tzJTIyOiU1QiU3QiUyMnglMjI6ODUsJTIyeSUyMjozMTEuODEyNSwlMjJ0eXBlJTIyOiUyMlN0b25lJTIyJTdELCU3QiUyMnglMjI6MTcxLCUyMnklMjI6MzcwLjUsJTIydHlwZSUyMjolMjJIb3Jpem9udGFsJTIyLCUyMmVkaXRSYW5nZSUyMjoxNTAlN0QsJTdCJTIyeCUyMjozMjQsJTIyeSUyMjoyNzEuNSwlMjJ0eXBlJTIyOiUyMlZlcnRpY2FsJTIyLCUyMmVkaXRSYW5nZSUyMjo5OCU3RCwlN0IlMjJ4JTIyOjQ4NiwlMjJ5JTIyOjI4Mi44MTI1LCUyMnR5cGUlMjI6JTIyU2FuZCUyMiU3RCwlN0IlMjJ4JTIyOjU2OSwlMjJ5JTIyOjMwNi4zMTI1LCUyMnR5cGUlMjI6JTIyRGVhdGglMjIlN0QsJTdCJTIyeCUyMjo3NzksJTIyeSUyMjoyODcsJTIydHlwZSUyMjolMjJTdG9uZSUyMiU3RCwlN0IlMjJ4JTIyOjg1MiwlMjJ5JTIyOjMwNS41LCUyMnR5cGUlMjI6JTIySG9yaXpvbnRhbCUyMiwlMjJlZGl0UmFuZ2UlMjI6MTUwJTdELCU3QiUyMnglMjI6NzMyLCUyMnklMjI6Mjg3LCUyMnR5cGUlMjI6JTIyU2FuZCUyMiU3RCU1RCwlMjJwbGF5ZXIlMjI6JTdCJTIyeCUyMjoxMDAsJTIyeSUyMjoyMDAlN0QsJTIyY29pbnMlMjI6JTVCJTdCJTIyeCUyMjo3OTEsJTIyeSUyMjoyMDEuODEyNSU3RCwlN0IlMjJ4JTIyOjM2MCwlMjJ5JTIyOjE4MSU3RCwlN0IlMjJ4JTIyOjM1OSwlMjJ5JTIyOjMwOSU3RCU1RCwlMjJjdXAlMjI6JTdCJTIyeCUyMjoxMTAzLCUyMnklMjI6MjEyJTdELCUyMmNhbWVyYSUyMjolN0IlMjJ4JTIyOjAsJTIyeSUyMjowJTdEJTdE"
-var linkLvl2 = "JTdCJTIyYmxvY2tzJTIyOiU1QiU3QiUyMnglMjI6MTg3LCUyMnklMjI6MTM5LCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjoxOTcsJTIyeSUyMjo0MDIuNSwlMjJ0eXBlJTIyOiUyMkhvcml6b250YWwlMjIsJTIyZWRpdFJhbmdlJTIyOjE1MCU3RCwlN0IlMjJ4JTIyOjkxLCUyMnklMjI6Mjk3LCUyMnR5cGUlMjI6JTIyU2FuZCUyMiU3RCwlN0IlMjJ4JTIyOjk0LCUyMnklMjI6MTM5LCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjo2MTUsJTIyeSUyMjoyMzUuOTA2MjUsJTIydHlwZSUyMjolMjJWZXJ0aWNhbCUyMiwlMjJlZGl0UmFuZ2UlMjI6NzUlN0QsJTdCJTIyeCUyMjo3NDUsJTIyeSUyMjozNDUuOTA2MjUsJTIydHlwZSUyMjolMjJEZWF0aCUyMiU3RCwlN0IlMjJ4JTIyOjg5MCwlMjJ5JTIyOjIxOSwlMjJ0eXBlJTIyOiUyMlN0b25lJTIyJTdELCU3QiUyMnglMjI6OTM1LCUyMnklMjI6MTcxLjQwNjI1LCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjoxMDc0LCUyMnklMjI6MjE1LCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjoxMDI3LCUyMnklMjI6MTY5LCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjo5NTYsJTIyeSUyMjo3My45MDYyNSwlMjJ0eXBlJTIyOiUyMlZlcnRpY2FsJTIyLCUyMmVkaXRSYW5nZSUyMjoyODglN0QsJTdCJTIyeCUyMjo0NDksJTIyeSUyMjozMjcuNSwlMjJ0eXBlJTIyOiUyMlZlcnRpY2FsJTIyLCUyMmVkaXRSYW5nZSUyMjo5NiU3RCwlN0IlMjJ4JTIyOjE0MCwlMjJ5JTIyOjkzLCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QlNUQsJTIycGxheWVyJTIyOiU3QiUyMnglMjI6MTAwLCUyMnklMjI6MjAwJTdELCUyMmNvaW5zJTIyOiU1QiU3QiUyMnglMjI6NjUxLCUyMnklMjI6Mjc1LjQwNjI1JTdELCU3QiUyMnglMjI6OTk1LCUyMnklMjI6MjMyLjQwNjI1JTdELCU3QiUyMnglMjI6NDg4LCUyMnklMjI6Mzc3JTdEJTVELCUyMmN1cCUyMjolN0IlMjJ4JTIyOjExMTksJTIyeSUyMjoxNjclN0QsJTIyY2FtZXJhJTIyOiU3QiUyMnglMjI6MCwlMjJ5JTIyOjAlN0QlN0Q"
-var linkLvl3 = "JTdCJTIyYmxvY2tzJTIyOiU1QiU3QiUyMnglMjI6OTcsJTIyeSUyMjozMjUsJTIydHlwZSUyMjolMjJTdG9uZSUyMiU3RCwlN0IlMjJ4JTIyOjE4NSwlMjJ5JTIyOjMyNC41LCUyMnR5cGUlMjI6JTIySG9yaXpvbnRhbCUyMiwlMjJlZGl0UmFuZ2UlMjI6MTUwJTdELCU3QiUyMnglMjI6MjgxLCUyMnklMjI6MzAwLjUsJTIydHlwZSUyMjolMjJIb3Jpem9udGFsJTIyLCUyMmVkaXRSYW5nZSUyMjoxNTAlN0QsJTdCJTIyeCUyMjozNzcsJTIyeSUyMjozMDAuNSwlMjJ0eXBlJTIyOiUyMlZlcnRpY2FsJTIyLCUyMmVkaXRSYW5nZSUyMjo3NSU3RCwlN0IlMjJ4JTIyOjU1NCwlMjJ5JTIyOjI2NywlMjJ0eXBlJTIyOiUyMlNhbmQlMjIlN0QsJTdCJTIyeCUyMjo2NDAsJTIyeSUyMjoxODIuNSwlMjJ0eXBlJTIyOiUyMkRlYXRoJTIyJTdELCU3QiUyMnglMjI6NzUzLCUyMnklMjI6MjIxLCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjo3OTksJTIyeSUyMjoyNjcsJTIydHlwZSUyMjolMjJTdG9uZSUyMiU3RCwlN0IlMjJ4JTIyOjg0NSwlMjJ5JTIyOjMxMywlMjJ0eXBlJTIyOiUyMlN0b25lJTIyJTdELCU3QiUyMnglMjI6ODkxLCUyMnklMjI6MzYwLjUsJTIydHlwZSUyMjolMjJIb3Jpem9udGFsJTIyLCUyMmVkaXRSYW5nZSUyMjo1MCU3RCwlN0IlMjJ4JTIyOjk4MSwlMjJ5JTIyOjI3MS41LCUyMnR5cGUlMjI6JTIyRGVhdGglMjIlN0QlNUQsJTIycGxheWVyJTIyOiU3QiUyMnglMjI6MTAwLCUyMnklMjI6MjAwJTdELCUyMmNvaW5zJTIyOiU1QiU3QiUyMnglMjI6NjY1LCUyMnklMjI6MTA3JTdELCU3QiUyMnglMjI6NDExLCUyMnklMjI6MzM1JTdELCU3QiUyMnglMjI6MTEyMywlMjJ5JTIyOjIzMiU3RCU1RCwlMjJjdXAlMjI6JTdCJTIyeCUyMjoxMTE1LCUyMnklMjI6MzIzJTdELCUyMmNhbWVyYSUyMjolN0IlMjJ4JTIyOjAsJTIyeSUyMjowJTdEJTdE"
+var linkLvl1 = "JTdCJTIyYmxvY2tzJTIyOiU1QiU3QiUyMnglMjI6ODUsJTIyeSUyMjozMTEuODEyNSwlMjJ0eXBlJTIyOiUyMlN0b25lJTIyJTdELCU3QiUyMnglMjI6MTcxLCUyMnklMjI6MzcwLjUsJTIydHlwZSUyMjolMjJIb3Jpem9udGFsJTIyLCUyMmVkaXRSYW5nZSUyMjoxNTAlN0QsJTdCJTIyeCUyMjozMjQsJTIyeSUyMjoyNzEuNSwlMjJ0eXBlJTIyOiUyMlZlcnRpY2FsJTIyLCUyMmVkaXRSYW5nZSUyMjo5OCU3RCwlN0IlMjJ4JTIyOjQ4NiwlMjJ5JTIyOjI4Mi44MTI1LCUyMnR5cGUlMjI6JTIyU2FuZCUyMiU3RCwlN0IlMjJ4JTIyOjU2OSwlMjJ5JTIyOjMwNi4zMTI1LCUyMnR5cGUlMjI6JTIyRGVhdGglMjIlN0QsJTdCJTIyeCUyMjo3NzksJTIyeSUyMjoyODcsJTIydHlwZSUyMjolMjJTdG9uZSUyMiU3RCwlN0IlMjJ4JTIyOjg1MiwlMjJ5JTIyOjMwNS41LCUyMnR5cGUlMjI6JTIySG9yaXpvbnRhbCUyMiwlMjJlZGl0UmFuZ2UlMjI6MTUwJTdELCU3QiUyMnglMjI6NzMyLCUyMnklMjI6Mjg3LCUyMnR5cGUlMjI6JTIyU2FuZCUyMiU3RCU1RCwlMjJwbGF5ZXIlMjI6JTdCJTIyeCUyMjoxMDAsJTIyeSUyMjoyMDAlN0QsJTIyY29pbnMlMjI6JTVCJTdCJTIyeCUyMjo3OTEsJTIyeSUyMjoyMDEuODEyNSU3RCwlN0IlMjJ4JTIyOjM2MCwlMjJ5JTIyOjE4MSU3RCwlN0IlMjJ4JTIyOjM1OSwlMjJ5JTIyOjMwOSU3RCU1RCwlMjJjdXAlMjI6JTdCJTIyeCUyMjoxMTAzLCUyMnklMjI6MjEyJTdELCUyMmNhbWVyYSUyMjolN0IlMjJ4JTIyOjAsJTIyeSUyMjowJTdEJTdE";
+var linkLvl2 = "JTdCJTIyYmxvY2tzJTIyOiU1QiU3QiUyMnglMjI6MTg3LCUyMnklMjI6MTM5LCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjoxOTcsJTIyeSUyMjo0MDIuNSwlMjJ0eXBlJTIyOiUyMkhvcml6b250YWwlMjIsJTIyZWRpdFJhbmdlJTIyOjE1MCU3RCwlN0IlMjJ4JTIyOjkxLCUyMnklMjI6Mjk3LCUyMnR5cGUlMjI6JTIyU2FuZCUyMiU3RCwlN0IlMjJ4JTIyOjk0LCUyMnklMjI6MTM5LCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjo2MTUsJTIyeSUyMjoyMzUuOTA2MjUsJTIydHlwZSUyMjolMjJWZXJ0aWNhbCUyMiwlMjJlZGl0UmFuZ2UlMjI6NzUlN0QsJTdCJTIyeCUyMjo3NDUsJTIyeSUyMjozNDUuOTA2MjUsJTIydHlwZSUyMjolMjJEZWF0aCUyMiU3RCwlN0IlMjJ4JTIyOjg5MCwlMjJ5JTIyOjIxOSwlMjJ0eXBlJTIyOiUyMlN0b25lJTIyJTdELCU3QiUyMnglMjI6OTM1LCUyMnklMjI6MTcxLjQwNjI1LCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjoxMDc0LCUyMnklMjI6MjE1LCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjoxMDI3LCUyMnklMjI6MTY5LCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjo5NTYsJTIyeSUyMjo3My45MDYyNSwlMjJ0eXBlJTIyOiUyMlZlcnRpY2FsJTIyLCUyMmVkaXRSYW5nZSUyMjoyODglN0QsJTdCJTIyeCUyMjo0NDksJTIyeSUyMjozMjcuNSwlMjJ0eXBlJTIyOiUyMlZlcnRpY2FsJTIyLCUyMmVkaXRSYW5nZSUyMjo5NiU3RCwlN0IlMjJ4JTIyOjE0MCwlMjJ5JTIyOjkzLCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QlNUQsJTIycGxheWVyJTIyOiU3QiUyMnglMjI6MTAwLCUyMnklMjI6MjAwJTdELCUyMmNvaW5zJTIyOiU1QiU3QiUyMnglMjI6NjUxLCUyMnklMjI6Mjc1LjQwNjI1JTdELCU3QiUyMnglMjI6OTk1LCUyMnklMjI6MjMyLjQwNjI1JTdELCU3QiUyMnglMjI6NDg4LCUyMnklMjI6Mzc3JTdEJTVELCUyMmN1cCUyMjolN0IlMjJ4JTIyOjExMTksJTIyeSUyMjoxNjclN0QsJTIyY2FtZXJhJTIyOiU3QiUyMnglMjI6MCwlMjJ5JTIyOjAlN0QlN0Q";
+var linkLvl3 = "JTdCJTIyYmxvY2tzJTIyOiU1QiU3QiUyMnglMjI6OTcsJTIyeSUyMjozMjUsJTIydHlwZSUyMjolMjJTdG9uZSUyMiU3RCwlN0IlMjJ4JTIyOjE4NSwlMjJ5JTIyOjMyNC41LCUyMnR5cGUlMjI6JTIySG9yaXpvbnRhbCUyMiwlMjJlZGl0UmFuZ2UlMjI6MTUwJTdELCU3QiUyMnglMjI6MjgxLCUyMnklMjI6MzAwLjUsJTIydHlwZSUyMjolMjJIb3Jpem9udGFsJTIyLCUyMmVkaXRSYW5nZSUyMjoxNTAlN0QsJTdCJTIyeCUyMjozNzcsJTIyeSUyMjozMDAuNSwlMjJ0eXBlJTIyOiUyMlZlcnRpY2FsJTIyLCUyMmVkaXRSYW5nZSUyMjo3NSU3RCwlN0IlMjJ4JTIyOjU1NCwlMjJ5JTIyOjI2NywlMjJ0eXBlJTIyOiUyMlNhbmQlMjIlN0QsJTdCJTIyeCUyMjo2NDAsJTIyeSUyMjoxODIuNSwlMjJ0eXBlJTIyOiUyMkRlYXRoJTIyJTdELCU3QiUyMnglMjI6NzUzLCUyMnklMjI6MjIxLCUyMnR5cGUlMjI6JTIyU3RvbmUlMjIlN0QsJTdCJTIyeCUyMjo3OTksJTIyeSUyMjoyNjcsJTIydHlwZSUyMjolMjJTdG9uZSUyMiU3RCwlN0IlMjJ4JTIyOjg0NSwlMjJ5JTIyOjMxMywlMjJ0eXBlJTIyOiUyMlN0b25lJTIyJTdELCU3QiUyMnglMjI6ODkxLCUyMnklMjI6MzYwLjUsJTIydHlwZSUyMjolMjJIb3Jpem9udGFsJTIyLCUyMmVkaXRSYW5nZSUyMjo1MCU3RCwlN0IlMjJ4JTIyOjk4MSwlMjJ5JTIyOjI3MS41LCUyMnR5cGUlMjI6JTIyRGVhdGglMjIlN0QlNUQsJTIycGxheWVyJTIyOiU3QiUyMnglMjI6MTAwLCUyMnklMjI6MjAwJTdELCUyMmNvaW5zJTIyOiU1QiU3QiUyMnglMjI6NjY1LCUyMnklMjI6MTA3JTdELCU3QiUyMnglMjI6NDExLCUyMnklMjI6MzM1JTdELCU3QiUyMnglMjI6MTEyMywlMjJ5JTIyOjIzMiU3RCU1RCwlMjJjdXAlMjI6JTdCJTIyeCUyMjoxMTE1LCUyMnklMjI6MzIzJTdELCUyMmNhbWVyYSUyMjolN0IlMjJ4JTIyOjAsJTIyeSUyMjowJTdEJTdE";
 var cupImg = "images/lock_r.png";
 var coinImg = "images/key_r.png";
 
 var slicerImg = "images/slicer.png";
-var backgroundImg = "images/bg.png"
-
-var hArrowImg = "images/horArrow.png";
-var vArrowImg = "images/vArrow.png";
+var backgroundImg = "images/bg_sea-min.png"; //bg-min.png
 
 var menuImg = "images/menu.png";
 var menuW = 50;
@@ -116,17 +109,14 @@ var cupWidth = 50;
 var cupHeight = 50;
 var cupEditing = false;
 
-var cupStartingX = canvasWidth - playerStartingX - cupWidth
-var cupStartingY = playerStartingY
+var cupStartingX = canvasWidth - playerStartingX - cupWidth;
+var cupStartingY = playerStartingY;
 var blocks = [];
 var tools = [];
 var toolsForPlaying = [];
 
 var toolsFunctions = ["Play", "Stone", "Horizontal", "Vertical", "Sand", "Death", "Coin"];
 var toolBarForPlaying = ["Play", "Menu"];
-var nextArrowImg = "images/arrowRight.png";
-var nextArrowW = 50;
-var nextArrowH = 50;
 
 var toolBarHeight = canvasHeight / 8;
 var seaStartingY = canvasHeight / 8 * 7;
@@ -139,7 +129,7 @@ var deleteButton = {
     y: canvasHeight - 50 - 15,   // - h - gap
     strokeWeight: 10,
     img: "images/trashBox.png"
-}
+};
 var horizontalBlocksSpeed = 0.75;
 var verticalBlocksSpeed = 0.75;
 
@@ -183,15 +173,13 @@ var base64;
 var playerFallingMaxSpeed = 6;
 var playerJumpV0 = -12;
 
-var informed = false;
-
 var star = {
     x: cupStartingX + cupWidth / 2,
     y: cupStartingY,
-    w: 20,
-    h: 20,
-    maxHeight: 50
-}
+    w: 50,
+    h: 50,
+    maxHeight: 75
+};
 var playerWonTemp = false;
 
 var minimap = {
@@ -207,3 +195,6 @@ var minimap = {
         h: canvasHeight/8
     }
 };
+////////////////////////////////////////////////////////////
+
+var collisionRange = 100;

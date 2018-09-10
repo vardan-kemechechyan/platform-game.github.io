@@ -22,9 +22,10 @@ var inputField = document.getElementById("data");
 var linkOk = document.getElementById("OK");
 var getLinkBox = document.getElementById("getLink")
 
+//MATTER OF INVESTIGATION: Check check() function for more detailed explanation
 //if there is a level created, the closing button is available
 function checkClose() {
-    if (blocks.length == 0 && levelsPassed < 3) {
+    if (blocks.length === 0 && levelsPassed < 3) {
         spanStart.style.display = "none"
     }
     else {
@@ -33,6 +34,7 @@ function checkClose() {
 }
 
 let input = checkInput();
+
 if(!input){
     startPopUp.style.display = 'block';
     //disables not passed levels to prevent cheating
@@ -85,38 +87,41 @@ saveButton.onclick = function () {
     saveCoords(data);
 }
 //draws level 1
+
+//MATTER OF INVESTIGATION: Instead of 3 anonynomous functions, should create one with parameter and use them for lvl1, lvl2, lvl3
 lvl1.onclick = function () {
     startPopUp.style.display = "none";
     playerWonTemp = false;
     popup = false;
     currentLvl = 1;
-    drawLevel(currentLvl)
-
+    drawLevel(currentLvl);
 }
+
 //draws level 2
 lvl2.onclick = function () {
     startPopUp.style.display = "none";
     playerWonTemp = false;
     popup = false;
     currentLvl = 2;
-    drawLevel(currentLvl)
-
+    drawLevel(currentLvl);
 }
+
 //draws level 3
 lvl3.onclick = function () {
     startPopUp.style.display = "none";
     playerWonTemp = false;
     popup = false;
     currentLvl = 3;
-    drawLevel(currentLvl)
+    drawLevel(currentLvl);
 }
+
 //start building your level and delete everything which was built before you
 letsstart.onclick = function () {
     playerWonTemp = false;
     playerWon = false;
     build.style.display = "none";
     popup = false;
-    levelsPassed++
+    levelsPassed++;
     deleteEverything();
     cup.x = cupStartingX;
     cup.y = cupStartingY;
@@ -126,13 +131,11 @@ letsstart.onclick = function () {
         coins: [],
         cup: { x: cupStartingX, y: cupStartingY },
         camera: { x: 0, y: 0 }
-    }
-
+    };
 }
 
-
+//MATTER OF INVESTIGATION: Check draw() function for more detailed explanation
 function check() {
-    let input = checkInput()
     if (input) {
         startPopUp.style.display = "none";
         popup = false;
@@ -147,19 +150,17 @@ function confirm() {
     popup = true;
 }
 
+//MATTER OF INVESTIGATION: Need to understand if is it always being called in the draw function or not
 //enables/disables the levels
 var flag = false;
 function enableDisable(passed) {
-    // for (let i = 3; i > passed; i--) {
-    //     window['lvl' + i].disabled = true;
-    //     window['lvl' + i].style.backgroundColor = "#aaa";
-    // }
     for (let i = 1; i <= passed; i++) {
         window['lvl' + i].disabled = false;
         window['lvl' + i].style.backgroundColor = window['lvl' + i].style.borderColor;
     }
 }
 
+//MATTER OF INVESTIGATION: Think if it is possible to merge into one function with one if
 //confirmation process
 confirmYes.onclick = function () {
     confBox.style.display = "none";
