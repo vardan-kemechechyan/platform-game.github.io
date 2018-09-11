@@ -1,4 +1,3 @@
-//MATTER OF INVESTIGATION: return a full link insted of the code
 //MATTER OF INVESTIGATION: get rid of global vars
 //MATTER OF INVESTIGATION: no dynamic data type change
 //MATTER OF INVESTIGATION: for (var i=0; i < arr.length; i++ ){} -> for (var i=0, n=arr.length; i < n; i++){}
@@ -40,12 +39,12 @@ class Player extends Parent {
 
     animate() {
         //makes the player transparent if needed
-        tint(255, 255 * this.opacity);
+
+        if(this.opacity != 1) tint(255, 255 * this.opacity);
         
-        if (!gameStarted) {
-            //standing picture of the player
-            image(playerSprite, this.x - (playerWalkSprite.w - this.w) / 2, this.y, playerWalkSprite.w, playerWalkSprite.h, ...playerStand);
-        }
+        //standing picture of the player
+        if (!gameStarted) image(playerSprite, this.x - (playerWalkSprite.w - this.w) / 2, this.y, playerWalkSprite.w, playerWalkSprite.h, ...playerStand);
+    
         else {
             if (this.left_right[0] || this.left_right[1]) {
                 //walking player
@@ -521,10 +520,9 @@ class Cup extends Parent {
     }
 
     drawCup() {
-        //drawing the cup (lock)
-        //this.checkAvailablity();
-        
-        tint(255, this.alpha * 255)
+        if(this.alpha != 1) {
+            tint(255, this.alpha * 255)
+        }
         image(cupImg, this.x, this.y, this.w, this.h);
         noTint();
     }

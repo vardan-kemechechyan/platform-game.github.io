@@ -255,7 +255,9 @@ function drawBlocks() {
                     image(metalImg, block.x, block.y, block.w, block.h, blocksRoundedCorners);
                     break;
             case "Sand":
-                    tint(255, block.type === "Sand" ? block.strength / sandBlockStartingStrength * 255 : 255);
+                    if(block.strength != 5) {
+                        tint(255, block.strength / sandBlockStartingStrength * 255);
+                    }
                     image(sandImg, block.x, block.y, block.w, block.h, blocksRoundedCorners);
                     noTint();
                     break;
