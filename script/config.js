@@ -172,7 +172,7 @@ var playerFallingMaxSpeed = 6;
 var playerJumpV0 = -12;
 
 var star = {
-    x: cupStartingX + cupWidth / 2,
+    x: cupStartingX + cupWidth / 2 - 25,
     y: cupStartingY,
     w: 50,
     h: 50,

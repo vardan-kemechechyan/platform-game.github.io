@@ -263,8 +263,10 @@ function keyReleased() {
     }
     if (keyCode === LEFT_ARROW) {
         player.left_right[0] = false;
+        player.currentFrame = 0;
     }
     if (keyCode === RIGHT_ARROW) {
         player.left_right[1] = false;
+        player.currentFrame = 0;
     }
 }

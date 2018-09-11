@@ -2,10 +2,7 @@
 //MATTER OF INVESTIGATION: get rid of global vars
 //MATTER OF INVESTIGATION: no dynamic data type change
 //MATTER OF INVESTIGATION: for (var i=0; i < arr.length; i++ ){} -> for (var i=0, n=arr.length; i < n; i++){}
-//MATTER OF INVESTIGATION: Fix the animation
-//MATTER OF INVESTIGATION: Generate link not code
 //MATTER OF INVESTIGATION: Shorten the code
-//MATTER OF INVESTIGATION: fix the positionning of the blocks
 
 class Parent {
     constructor(x, y, w, h) {
@@ -27,6 +24,8 @@ class Player extends Parent {
         this.eatenCoins = 0;
         this.opacity = 1;
         this.blinkCount = 0;
+        this.animFrameChange = 2;
+        this.currentFrame = 0;
         this.collision = {
             right: false,
             left: false,
@@ -50,7 +49,9 @@ class Player extends Parent {
         else {
             if (this.left_right[0] || this.left_right[1]) {
                 //walking player
-                image(playerSprite, this.x - (playerWalkSprite.w - this.w) / 2, this.y, playerWalkSprite.w, playerWalkSprite.h, window['playerWalk' + (this.walkCounter >= 0 ? this.walkCounter : "_" + Math.abs(this.walkCounter))].x, window['playerWalk' + (this.walkCounter >= 0 ? this.walkCounter : "_" + Math.abs(this.walkCounter))].y, playerWalkSprite.w, playerWalkSprite.h);
+                let wc = (this.walkCounter >= 0 ? this.walkCounter : "_" + Math.abs(this.walkCounter));
+
+                image(playerSprite, this.x - (playerWalkSprite.w - this.w) / 2, this.y, playerWalkSprite.w, playerWalkSprite.h, window['playerWalk' + wc].x, window['playerWalk' + wc].y, playerWalkSprite.w, playerWalkSprite.h);
             }
             else {
                 //standing picture of the player
@@ -79,8 +80,10 @@ class Player extends Parent {
 
     move() {
         // looping sprite animation
+        ++this.currentFrame;
+
         if (this.walkCounter === playerWalkFrames - 1 || this.walkCounter === -playerWalkFrames + 1) {
-            this.walkCounter = 0;
+            this.walkCounter = 1 * this.dirX;
         }
         if (this.left_right[0] && !this.collision.left) {
             //flips the player if it needs to be filpped
@@ -89,7 +92,7 @@ class Player extends Parent {
                 this.dirX = -1;
             }
             else {
-                this.walkCounter--;
+                if( this.currentFrame % this.animFrameChange === 0) this.walkCounter--;
             }
 
             if (this.x > 0) {
@@ -107,7 +110,7 @@ class Player extends Parent {
                 this.dirX = 1;
             }
             else {
-                this.walkCounter++;
+                if( this.currentFrame % this.animFrameChange === 0) this.walkCounter++;
             }
             if (this.x + this.w <= backgroundSize) {
                 this.x += this.speedX;
@@ -520,6 +523,7 @@ class Cup extends Parent {
     drawCup() {
         //drawing the cup (lock)
         //this.checkAvailablity();
+        
         tint(255, this.alpha * 255)
         image(cupImg, this.x, this.y, this.w, this.h);
         noTint();
