@@ -131,10 +131,8 @@ function draw() {
         }
     }
 
-    //checks if there is an input or not. if the condition is satisfied, it closes the "starting" popup
-    //check(); // MATTER OF INVESTIGATION: do we need to check this function on each draw step? Maybe we can attach it to an event e.g. load/click/etc?
     //draws the background
-    drawBackground(x, y); // MATTER OF INVESTIGATION
+    drawBackground(x, y);
 
     //saves the object in a variable
     var menu = toolsForPlaying.find(function (item) {

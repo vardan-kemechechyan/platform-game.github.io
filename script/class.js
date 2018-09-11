@@ -1,15 +1,11 @@
-//MATTER OF INVESTIGATION: disable mouse moving the screen when the game has started DONE
 //MATTER OF INVESTIGATION: return a full link insted of the code
-//MATTER OF INVESTIGATION: draw the blocks that are in the frame +- some range
-//MATTER OF INVESTIGATION: check collision with the blocks that are in some range
 //MATTER OF INVESTIGATION: get rid of global vars
-//MATTER OF INVESTIGATION: png -> jpg
-//MATTER OF INVESTIGATION: 1 megaspritesheet instead of separate files
 //MATTER OF INVESTIGATION: no dynamic data type change
-//MATTER OF INVESTIGATION: no passing images to the objects as a class parameter
-//MATTER OF INVESTIGATION: Change the toolbar to static images
-//MATTER OF INVESTIGATION: Change all == to ===
 //MATTER OF INVESTIGATION: for (var i=0; i < arr.length; i++ ){} -> for (var i=0, n=arr.length; i < n; i++){}
+//MATTER OF INVESTIGATION: Fix the animation
+//MATTER OF INVESTIGATION: Generate link not code
+//MATTER OF INVESTIGATION: Shorten the code
+//MATTER OF INVESTIGATION: fix the positionning of the blocks
 
 class Parent {
     constructor(x, y, w, h) {
@@ -53,7 +49,6 @@ class Player extends Parent {
         }
         else {
             if (this.left_right[0] || this.left_right[1]) {
-                //MATTER OF INVESTIGATION: Revise the referencing the global variable via window and concatinating strategy. 
                 //walking player
                 image(playerSprite, this.x - (playerWalkSprite.w - this.w) / 2, this.y, playerWalkSprite.w, playerWalkSprite.h, window['playerWalk' + (this.walkCounter >= 0 ? this.walkCounter : "_" + Math.abs(this.walkCounter))].x, window['playerWalk' + (this.walkCounter >= 0 ? this.walkCounter : "_" + Math.abs(this.walkCounter))].y, playerWalkSprite.w, playerWalkSprite.h);
             }
@@ -128,7 +123,7 @@ class Player extends Parent {
             this.speedY += gravity;
 
         //if the block with which the player has a collision is a "Vertical" block, the player takes its velocity 
-        if (this.collision.down) //MATTER OF INVESTIGATION: Can't we merge it into one if ? : if (this.collision.down && this.downCollBlock.type == "Vertical")
+        if (this.collision.down)
             this.speedY = this.downCollBlock.type === "Vertical" ? this.downCollBlock.dirY : 0;
         //a part of jumping
         if (!this.collision.up || this.speedY >= 0)
@@ -137,7 +132,6 @@ class Player extends Parent {
             this.speedY = 0;
 
         //player drowns
-        //MATTER OF INVESTIGATION: If the player is dead can it drown? do we need the !player.dead ? What will happen if delete it
         if (this.y >= seaStartingY - this.h / 2 && !player.dead)
             this.die();
     }
@@ -158,7 +152,6 @@ class Player extends Parent {
         }
     }
 
-    
     //MATTER OF INVESTIGATION: check the loops and if
     //MATTER OF INVESTIGATION: merge into one loop
     checkCollision() {
@@ -277,7 +270,7 @@ class Player extends Parent {
             }
         }
 
-        // MATTER OF INVESTIGATION: This can be optimized: a. Instead of checking availabilit
+        //MATTER OF INVESTIGATION: This can be optimized: a. Instead of checking availabilit
         //collision with the cup (lock)
         //EDITED BY VARDAN
         if (cup.available) {

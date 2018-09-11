@@ -2,21 +2,19 @@ function drawBackground(x, y) {
     //checks if the player wants to move the background with the mouse or not
     /*if(!gameStarted)*/ checkMouseMovement(); // OK, DON'T TOUCH
 
-    //MATTER OF INVESTIGATION: Draw a static BG only, no movement
     image(backgroundImg, 0, 0, width, height);
 
     //sets x,y to 0,0
-    translate(x, y); //MATTER OF INVESTIGATION: why do we need this on each draw call?
+    translate(x, y);
     //draws the world
-    player.animate(); //MATTER OF INVESTIGATION: why is it called in the drawBackground function? maybe it should be in draw function
+    player.animate();
 
     drawBlocks();
     cup.drawCup(); // MATTER OF INVESTIGATION: This can be optimized: a. Instead of checking availability on each frame, the function can be called on each collision with the keys
     //sets the starting points to the default
-    translate(-x, -y); //MATTER OF INVESTIGATION: why do we need this on each draw call?
+    translate(-x, -y);
     drawToolBar();
 
-    //MATTER OF INVESTIGATION: Draw the minimap only in the edit menu.
     if (!gameStarted && !starIsRising) {
         //synchronizes the minimap with the actual map
         minimapCameraMove(minimap);
@@ -442,7 +440,6 @@ function drawLevel(num) {
     gameStarted = true;
 }
 
-//MATTER OF INVESTIGATION: The function is called to many times in the draw() function. Need to redesign it in such way that it is called onces per event and stores the value in a global variable. and work with that variable instead of calling the function each time
 function checkInput() {
     //checks if there is an input in the link
     let url = location.href;

@@ -22,7 +22,6 @@ var inputField = document.getElementById("data");
 var linkOk = document.getElementById("OK");
 var getLinkBox = document.getElementById("getLink")
 
-//MATTER OF INVESTIGATION: Check check() function for more detailed explanation
 //if there is a level created, the closing button is available
 function checkClose() {
     if (blocks.length === 0 && levelsPassed < 3) {
@@ -86,9 +85,8 @@ saveButton.onclick = function () {
     popup = false;
     saveCoords(data);
 }
-//draws level 1
 
-//MATTER OF INVESTIGATION: Instead of 3 anonynomous functions, should create one with parameter and use them for lvl1, lvl2, lvl3
+//draws level 1
 lvl1.onclick = function () {
     startPopUp.style.display = "none";
     playerWonTemp = false;
@@ -134,23 +132,12 @@ letsstart.onclick = function () {
     };
 }
 
-//MATTER OF INVESTIGATION: Check draw() function for more detailed explanation
-function check() {
-    if (input) {
-        startPopUp.style.display = "none";
-        popup = false;
-    }
-
-    checkClose();
-}
-
 //confirms the deletation
 function confirm() {
     confBox.style.display = "block";
     popup = true;
 }
 
-//MATTER OF INVESTIGATION: Need to understand if is it always being called in the draw function or not
 //enables/disables the levels
 var flag = false;
 function enableDisable(passed) {
@@ -160,7 +147,6 @@ function enableDisable(passed) {
     }
 }
 
-//MATTER OF INVESTIGATION: Think if it is possible to merge into one function with one if
 //confirmation process
 confirmYes.onclick = function () {
     confBox.style.display = "none";
