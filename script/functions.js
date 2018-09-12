@@ -1,16 +1,17 @@
 function drawBackground(x, y) {
     //checks if the player wants to move the background with the mouse or not
-    /*if(!gameStarted)*/ checkMouseMovement(); // OK, DON'T TOUCH
+    /*if(!gameStarted)*/ checkMouseMovement(); // Uncomment if you want to disable the mouse camera movement in the game.
 
     image(backgroundImg, 0, 0, width, height);
 
     //sets x,y to 0,0
     translate(x, y);
+
     //draws the world
     player.animate();
 
     drawBlocks();
-    cup.drawCup(); // MATTER OF INVESTIGATION: This can be optimized: a. Instead of checking availability on each frame, the function can be called on each collision with the keys
+    cup.drawCup();
     //sets the starting points to the default
     translate(-x, -y);
     drawToolBar();
@@ -25,10 +26,8 @@ function drawBackground(x, y) {
 
 function blink() {
     //blink function
-    if (player.opacity === 1)
-        player.opacity = 0.5;
-    else
-        player.opacity = 1;
+    if (player.opacity === 1) player.opacity = 0.5;
+    else player.opacity = 1;
 }
 function drawToolBar() {
     //if(player passed 3 levels or inserted a link, the toolBar allows him to make editions)
@@ -39,7 +38,6 @@ function drawToolBar() {
 
             if (tools[i].f === "Stone" || tools[i].f === "Horizontal" || tools[i].f === "Vertical" || tools[i].f === "Death" || tools[i].f === "Sand" || tools[i].f === "Coin") {
                 //prepares images for scaling
-                //var img = tools[i].img;
                 var imageWidth = tools[i].imgW;
                 var imageHeight = tools[i].imgH;
                 if(tools[i].f === "Stone")
@@ -268,7 +266,7 @@ function drawBlocks() {
 
     noStroke();
     //drawing the coins (keys)
-    for(var i in coins) image(coinImg, coins[i].x, coins[i].y, coins[i].h, coins[i].w);
+    for(let i in coins) image(coinImg, coins[i].x, coins[i].y, coins[i].h, coins[i].w);
 }
 
 function editBlocks() {
@@ -306,6 +304,7 @@ function updateBlocksCoordinates(i) {
     }
 }
 
+//MATTER OF INVESTIGATION: Get rid of setinterval
 function sandBreaker(obj) {
     // breaks the sandBlock
     var breakInt = setInterval(function () {

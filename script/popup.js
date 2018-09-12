@@ -139,7 +139,6 @@ function confirm() {
 }
 
 //enables/disables the levels
-var flag = false;
 function enableDisable(passed) {
     for (let i = 1; i <= passed; i++) {
         window['lvl' + i].disabled = false;

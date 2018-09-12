@@ -1,7 +1,4 @@
-//MATTER OF INVESTIGATION: get rid of global vars
-//MATTER OF INVESTIGATION: no dynamic data type change
-//MATTER OF INVESTIGATION: for (var i=0; i < arr.length; i++ ){} -> for (var i=0, n=arr.length; i < n; i++){}
-//MATTER OF INVESTIGATION: Shorten the code
+//MATTER OF INVESTIGATION: get rid of vars in the loops. var -> let
 
 class Parent {
     constructor(x, y, w, h) {
@@ -259,7 +256,7 @@ class Player extends Parent {
         }
 
         //ADDED BY VARDAN
-        for (var c in coins) {
+        for (let c in coins) {
             if(Math.abs(coins[c].x + coins[c].w/2 - that.x - that.w / 2) < collisionRange)
             {
                 if (that.x + that.w > coins[c].x && that.x < coins[c].x + coins[c].w && that.y + that.h > coins[c].y && that.y < coins[c].y + coins[c].h) {
@@ -300,7 +297,7 @@ class Player extends Parent {
 
     snap() {
         //doesn't let the blocks to be on the player
-        for (var b in blocks) {
+        for (let b in blocks) {
             let block = blocks[b];
             if (this.y - block.y + this.h < this.h / 2 && this.y - block.y + this.h > 0 && this.x - block.x <= block.w && block.x - this.x <= this.w) {
 

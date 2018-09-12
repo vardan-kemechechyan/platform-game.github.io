@@ -28,7 +28,7 @@ function setup() {
     createCanvas(canvasWidth, canvasHeight);
     noStroke();
     //preparing the toolBar
-    for (let i = 0; i < toolsFunctions.length; i++) {
+    for (let i = 0, n = toolsFunctions.length; i < n; i++) {
         tools.push({
             x: i * width / toolsFunctions.length,
             y: 0,
@@ -80,7 +80,7 @@ function setup() {
         }
     }
 
-    for (let i = 0; i < toolBarForPlaying.length; i++) {
+    for (let i = 0, n = toolBarForPlaying.length; i < n; i++) {
         toolsForPlaying.push({
             x: i * width / toolBarForPlaying.length,
             y: 0,
@@ -112,6 +112,8 @@ function setup() {
     }
 }
 
+var menu;
+
 function draw() {
 
     if(player.dead)
@@ -135,9 +137,12 @@ function draw() {
     drawBackground(x, y);
 
     //saves the object in a variable
-    var menu = toolsForPlaying.find(function (item) {
-        return item.f === "Menu";
-    });
+    if(menu == undefined)
+    {
+        menu = toolsForPlaying.find(function (item) {
+            return item.f === "Menu";
+        });
+    }
     //enable/disable the menu
     if (gameStarted)
         menu.opacity = 0.5;
