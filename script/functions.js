@@ -359,6 +359,10 @@ function fix() {
 }
 
 function saveCoords(data) {
+    // camera values lay in [0, -700]; if you want the camera to always start from the beginning of the level: data.camera = {x: 0, y: 0};
+    let cameraFollow = (player.x + player.w/2 - canvasWidth/2) * -1;
+    data.camera = {x: cameraFollow, y: 0};
+
     //prepares the url 
     var json = JSON.stringify(data);
     let url = location.href;
